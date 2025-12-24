@@ -1,18 +1,20 @@
-import axios from "axios";
-import cheerio from "cheerio";
-import { logger } from "../utils/logger.js";
+import fetch from "node-fetch";
+import * as cheerio from "cheerio";
 
 export async function scrapeArticleContent(url) {
-  logger.info(`Scraping article: ${url}`);
-
   try {
-    const { data } = await axios.get(url, { timeout: 10000 });
-    const $ = cheerio.load(data);
+    const res = await fetch(url);
+    const html = await res.text();
 
-    const text = $("article").text() || $("body").text();
-    return text.substring(0, 3000); // limit content
-  } catch (err) {
-    logger.error(`Failed to scrape ${url}`);
-    return "";
+    const $ = cheerio.load(html);
+    const text = $("p")
+      .map((_, el) => $(el).text())
+      .get()
+      .join(" ");
+
+    return text.slice(0, 3000); // limit content
+  } catch (error) {
+    console.error("Scraping failed:", error.message);
+    return null;
   }
 }

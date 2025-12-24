@@ -12,18 +12,7 @@ class Article extends Model
     protected $fillable = [
         'title',
         'content',
-        'source_url',
         'version',
-        'parent_article_id'
+        'parent_article_id',
     ];
-
-    public function parent()
-    {
-        return $this->belongsTo(Article::class, 'parent_article_id');
-    }
-
-    public function versions()
-    {
-        return $this->hasMany(Article::class, 'parent_article_id');
-    }
 }

@@ -3,39 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use App\Http\Requests\StoreArticleRequest;
-use App\Http\Resources\ArticleResource;
 use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        return ArticleResource::collection(
-            Article::latest()->paginate(10)
-        );
+        return response()->json([
+            'data' => Article::latest()->get()
+        ]);
     }
 
-    public function show(Article $article)
+    public function show($id)
     {
-        return new ArticleResource($article);
+        return response()->json([
+            'data' => Article::findOrFail($id)
+        ]);
     }
 
-    public function store(StoreArticleRequest $request)
+    public function store(Request $request)
     {
-        $article = Article::create($request->validated());
-        return new ArticleResource($article);
-    }
+        $data = $request->validate([
+            'title' => 'required|string',
+            'content' => 'required|string',
+            'version' => 'nullable|string',
+            'parent_article_id' => 'nullable|integer'
+        ]);
 
-    public function update(StoreArticleRequest $request, Article $article)
-    {
-        $article->update($request->validated());
-        return new ArticleResource($article);
-    }
+        $article = Article::create($data);
 
-    public function destroy(Article $article)
-    {
-        $article->delete();
-        return response()->json(['message' => 'Deleted']);
+        return response()->json(['data' => $article], 201);
     }
 }

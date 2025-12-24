@@ -1,41 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
-
-use App\Models\Article;
-use App\Http\Requests\StoreArticleRequest;
-use App\Http\Resources\ArticleResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ArticleController;
 
-class ArticleController extends Controller
-{
-    public function index(Request $request)
-    {
-        return ArticleResource::collection(
-            Article::latest()->paginate(10)
-        );
-    }
-
-    public function show(Article $article)
-    {
-        return new ArticleResource($article);
-    }
-
-    public function store(StoreArticleRequest $request)
-    {
-        $article = Article::create($request->validated());
-        return new ArticleResource($article);
-    }
-
-    public function update(StoreArticleRequest $request, Article $article)
-    {
-        $article->update($request->validated());
-        return new ArticleResource($article);
-    }
-
-    public function destroy(Article $article)
-    {
-        $article->delete();
-        return response()->json(['message' => 'Deleted']);
-    }
-}
+Route::get('/articles', [ArticleController::class, 'index']);
+Route::get('/articles/{id}', [ArticleController::class, 'show']);
+Route::post('/articles', [ArticleController::class, 'store']);
